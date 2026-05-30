@@ -7,7 +7,7 @@ interface FullScreenLoaderProps {
     className?: string;
 }
 
-const FullScreenLoader: React.FC<FullScreenLoaderProps> = ({ message, className }) => {
+const FullScreenLoader: React.FC<FullScreenLoaderProps> = ({ message = 'Loading...', className }) => {
   return (
     <div className={cn("min-h-screen flex flex-col items-center justify-center w-full", className)}>
         <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
