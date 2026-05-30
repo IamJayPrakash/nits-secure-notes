@@ -24,9 +24,19 @@ const connectDB = async () => {
     return;
   }
 
-  // If connection is in progress, await it
+  // If connection is in progress, await the connection events
   if (mongoose.connection.readyState === 2) {
-    console.log("MongoDB connection is already connecting...");
+    console.log("MongoDB connection is in progress, waiting...");
+    await new Promise((resolve, reject) => {
+      mongoose.connection.once("connected", () => {
+        console.log("MongoDB connection finished (connecting -> connected)");
+        resolve();
+      });
+      mongoose.connection.once("error", (err) => {
+        console.error("MongoDB connection failed while waiting:", err.message);
+        reject(err);
+      });
+    });
     return;
   }
 
