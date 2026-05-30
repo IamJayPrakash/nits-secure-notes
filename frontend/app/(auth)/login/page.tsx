@@ -1,5 +1,7 @@
+import { Card } from "@/components/ui/card";
+
 const Login = () => {
-  return <div>Login</div>;
+  return <Card className="">Login</Card>;
 };
 
 export default Login;
