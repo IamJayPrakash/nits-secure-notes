@@ -7,30 +7,118 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 
 const LoginPage = () => {
+  const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (activeTab === "login") {
+      console.log("Logging in with:", { email, password });
+    } else {
+      console.log("Registering with:", { email, password, confirmPassword });
+    }
+  };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-blue-900 via-purple-900 to-pink-900">
-      <Card className="p-8 w-full max-w-md shadow-lg">
-        <h2 className="text-xl font-semibold mb-4">Login</h2>
-        <Label htmlFor="email">Email</Label>
-        <Input
-          id="email"
-          type="email"
-          placeholder="Enter your email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-        <Label htmlFor="password">Password</Label>
-        <Input
-          id="password"
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button type="submit">Login</Button>
+    <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4">
+      <Card className="p-8 w-full max-w-sm border border-slate-100 shadow-md bg-white rounded-2xl">
+        <h1 className="text-[28px] font-bold text-center text-slate-800 tracking-tight mb-6">
+          Secure Notes
+        </h1>
+
+        {/* Tab Toggle Selector */}
+        <div className="flex bg-slate-100/80 p-1 rounded-xl mb-6 border border-slate-200/50">
+          <button
+            type="button"
+            onClick={() => setActiveTab("login")}
+            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+              activeTab === "login"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            Login
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("register")}
+            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+              activeTab === "register"
+                ? "bg-primary text-primary-foreground shadow-xs"
+                : "text-slate-600 hover:text-slate-900"
+            }`}
+          >
+            Register
+          </button>
+        </div>
+
+        {/* Auth Form */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-sm font-semibold text-slate-700">
+              Email
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="Enter your email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full bg-slate-50/70 border-slate-200 rounded-lg focus:bg-white transition-colors"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="password" className="text-sm font-semibold text-slate-700">
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full bg-slate-50/70 border-slate-200 rounded-lg focus:bg-white transition-colors"
+            />
+          </div>
+
+          {activeTab === "register" && (
+            <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+              <Label htmlFor="confirmPassword" className="text-sm font-semibold text-slate-700">
+                Confirm Password
+              </Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="w-full bg-slate-50/70 border-slate-200 rounded-lg focus:bg-white transition-colors"
+              />
+            </div>
+          )}
+
+          <Button
+            type="submit"
+            className="w-full py-6 mt-6 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all shadow-xs"
+          >
+            {activeTab === "login" ? "Login" : "Register"}
+          </Button>
+        </form>
+
+        {activeTab === "login" && (
+          <a
+            href="/forgotpassword"
+            className="block text-center mt-5 text-sm font-medium text-slate-500 hover:text-primary transition-colors"
+          >
+            Forgot password?
+          </a>
+        )}
       </Card>
     </div>
   );
