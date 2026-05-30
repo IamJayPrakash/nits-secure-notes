@@ -19,10 +19,15 @@ const connectDB = require("./config/db"); // MongoDB connection function
 // Read PORT from environment, fallback to 5000 if not set
 const PORT = process.env.PORT || 5000;
 
-// Connect to MongoDB, then start the HTTP server.
-// We connect to the DB first to ensure the app is ready to handle requests.
+// Connect to MongoDB
 connectDB();
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Only listen on a port if not running in serverless production (Vercel)
+if (process.env.NODE_ENV !== "production") {
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// Export the app so Vercel can mount it as a serverless function handler
+module.exports = app;
