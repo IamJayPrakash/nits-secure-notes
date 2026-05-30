@@ -1,5 +1,3 @@
-const Register = () => {
-  return <div>Register</div>;
-};
+import { LoginPage } from "@/components";
 
-export default Register
+export default LoginPage;

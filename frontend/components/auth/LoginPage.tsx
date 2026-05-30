@@ -4,10 +4,14 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 const LoginPage = () => {
-  const [activeTab, setActiveTab] = useState<"login" | "register">("login");
+  const router = useRouter();
+  const pathname = usePathname();
+  const activeTab = pathname === "/register" ? "register" : "login";
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -32,8 +36,8 @@ const LoginPage = () => {
         <div className="flex bg-slate-100/80 p-1 rounded-xl mb-6 border border-slate-200/50">
           <button
             type="button"
-            onClick={() => setActiveTab("login")}
-            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+            onClick={() => router.push("/login")}
+            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
               activeTab === "login"
                 ? "bg-primary text-primary-foreground shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
@@ -43,8 +47,8 @@ const LoginPage = () => {
           </button>
           <button
             type="button"
-            onClick={() => setActiveTab("register")}
-            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 ${
+            onClick={() => router.push("/register")}
+            className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer ${
               activeTab === "register"
                 ? "bg-primary text-primary-foreground shadow-xs"
                 : "text-slate-600 hover:text-slate-900"
