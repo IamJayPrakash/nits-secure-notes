@@ -16,8 +16,7 @@ export interface NotePayload {
 }
 
 export interface NotesQuery {
-  search?: string;
-  sortBy?: "createdAt" | "updatedAt" | "title";
+  sortBy?: "createdAt" | "updatedAt";
   order?: "asc" | "desc";
 }
 

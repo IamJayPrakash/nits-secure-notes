@@ -8,14 +8,14 @@ const {
   deleteNote,
 } = require("../controllers/notes.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
-const { noteValidation, searchValidation } = require("../utils/validations/notes.validation");
+const { noteValidation, sortValidation } = require("../utils/validations/notes.validation");
 const validate = require("../middlewares/validate.middleware");
 
 const router = express.Router();
 
 router.use(authMiddleware);
 
-router.get("/", searchValidation, validate, getNotes);
+router.get("/", sortValidation, validate, getNotes);
 
 router.get("/:id", getSingleNote);
 

@@ -12,16 +12,10 @@ exports.noteValidation = [
     .isLength({ min: 1, max: 50000 }).withMessage("Description must be under 50,000 characters"),
 ];
 
-exports.searchValidation = [
-  query("search")
-    .optional()
-    .trim()
-    .escape()
-    .isLength({ max: 200 }).withMessage("Search term too long"),
-
+exports.sortValidation = [
   query("sortBy")
     .optional()
-    .isIn(["createdAt", "updatedAt", "title"])
+    .isIn(["createdAt", "updatedAt"])
     .withMessage("Invalid sort field"),
 
   query("order")

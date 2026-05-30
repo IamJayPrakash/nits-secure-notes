@@ -1,23 +1,15 @@
 const Note = require("../models/Notes");
 
 /**
- * Get all notes for a user with optional search and sort.
+ * Get all notes for a user with optional sorting.
  * @param {string} userId
- * @param {{ search?: string, sortBy?: string, order?: string }} options
+ * @param {{ sortBy?: string, order?: string }} options
  */
-const getNotes = async (userId, { search = "", sortBy = "createdAt", order = "desc" } = {}) => {
+const getNotes = async (userId, { sortBy = "createdAt", order = "desc" } = {}) => {
   const filter = { userId };
 
-  if (search) {
-    const safeSearch = search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // escape regex chars
-    filter.$or = [
-      { title: { $regex: safeSearch, $options: "i" } },
-      { description: { $regex: safeSearch, $options: "i" } },
-    ];
-  }
-
   const sortOrder = order === "asc" ? 1 : -1;
-  const allowedSortFields = ["createdAt", "updatedAt", "title"];
+  const allowedSortFields = ["createdAt", "updatedAt"];
   const safeSortBy = allowedSortFields.includes(sortBy) ? sortBy : "createdAt";
 
   return Note.find(filter).sort({ [safeSortBy]: sortOrder });

@@ -9,8 +9,6 @@ interface NotesContextType {
   notes: Note[];
   isLoading: boolean;
   isError: boolean;
-  searchQuery: string;
-  setSearchQuery: (q: string) => void;
   sortBy: NotesQuery["sortBy"];
   setSortBy: (s: NotesQuery["sortBy"]) => void;
   order: NotesQuery["order"];
@@ -27,11 +25,10 @@ export function NotesProvider({ children }: { children: ReactNode }) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<NotesQuery["sortBy"]>("createdAt");
   const [order, setOrder] = useState<NotesQuery["order"]>("desc");
 
-  const queryKey = ["notes", searchQuery, sortBy, order];
+  const queryKey = ["notes", sortBy, order];
 
   const {
     data: notes = [],
@@ -39,7 +36,7 @@ export function NotesProvider({ children }: { children: ReactNode }) {
     isError,
   } = useQuery({
     queryKey,
-    queryFn: () => notesService.getAll({ search: searchQuery, sortBy, order }),
+    queryFn: () => notesService.getAll({ sortBy, order }),
     enabled: !!user,
   });
 
@@ -79,8 +76,6 @@ export function NotesProvider({ children }: { children: ReactNode }) {
         notes,
         isLoading,
         isError,
-        searchQuery,
-        setSearchQuery,
         sortBy,
         setSortBy,
         order,

@@ -12,13 +12,13 @@ const { sendSuccess, sendError } = require("../utils/response");
 
 /**
  * Handles fetching all notes for the authenticated user.
- * Supports query parameters for search, sorting, and ordering.
+ * Supports query parameters for sorting and ordering.
  */
 const getNotes = async (req, res) => {
   try {
-    const { search, sortBy, order } = req.query;
+    const { sortBy, order } = req.query;
     // req.user is set by authMiddleware; we pass its userId to fetch notes
-    const notes = await notesService.getNotes(req.user.userId, { search, sortBy, order });
+    const notes = await notesService.getNotes(req.user.userId, { sortBy, order });
     return sendSuccess(res, 200, "Notes fetched", notes);
   } catch (error) {
     // Send 500 error unless the error has a specific status code set
