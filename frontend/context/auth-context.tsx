@@ -1,7 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
+interface User {
+  email: string;
+}
+
 interface AuthContextType {
-  user: any;
+  user: User | null;
   login: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
 }
@@ -9,7 +13,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
 
   const login = async (email: string, password: string) => {
     // Handle login logic here
@@ -37,5 +41,3 @@ export function useAuth() {
   }
   return context;
 }
-
-export default auth-context
