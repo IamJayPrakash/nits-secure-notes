@@ -4,10 +4,10 @@ exports.noteValidation = [
   body("title")
     .trim()
     .notEmpty()
-    .withMessage("Title is required"),
+    .withMessage("Title required"),
 
-  body("description")
+  body("content")
     .trim()
     .notEmpty()
-    .withMessage("Description is required"),
+    .withMessage("Content required"),
 ];
