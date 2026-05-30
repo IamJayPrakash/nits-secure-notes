@@ -2,16 +2,32 @@
 // config/db.js — MongoDB Connection
 //
 // This module exports a single function that connects to MongoDB.
-// It is called once in index.js at server startup.
-//
-// Why separate file?
-//   Centralises DB config — if you switch to a different DB later,
-//   you only change this one file.
+// Caches the connection in serverless environments to prevent connection limits.
 // ─────────────────────────────────────────────────────────────────────────────
 
 const mongoose = require("mongoose");
 
-let cachedConnection = null;
+if (!process.env.MONGO_URI) {
+  throw new Error("Please define the MONGO_URI environment variable inside .env.local");
+}
+
+/**
+ * Global is used here to maintain a cached connection across hot reloads
+ * in development and serverless container reuse.
+ */
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
+// Register global connection error listener once to prevent uncaught exceptions/unhandled rejections
+if (!global.mongooseRegistered) {
+  mongoose.connection.on("error", (err) => {
+    console.error("Mongoose connection error event:", err.message);
+  });
+  global.mongooseRegistered = true;
+}
 
 /**
  * Connects to MongoDB using the URI from environment variables.
@@ -20,37 +36,39 @@ let cachedConnection = null;
 const connectDB = async () => {
   // If we already have a connection, reuse it
   if (mongoose.connection.readyState === 1) {
-    console.log("MongoDB using cached connection");
-    return;
+    return mongoose.connection;
   }
 
-  // If connection is in progress, await the connection events
-  if (mongoose.connection.readyState === 2) {
-    console.log("MongoDB connection is in progress, waiting...");
-    await new Promise((resolve, reject) => {
-      mongoose.connection.once("connected", () => {
-        console.log("MongoDB connection finished (connecting -> connected)");
-        resolve();
-      });
-      mongoose.connection.once("error", (err) => {
-        console.error("MongoDB connection failed while waiting:", err.message);
-        reject(err);
-      });
+  if (cached.conn) {
+    return cached.conn;
+  }
+
+  // If there's no connection in progress, start one
+  if (!cached.promise) {
+    console.log("Connecting to MongoDB...");
+    const opts = {
+      bufferCommands: false, // Disable buffering for serverless to fail fast
+    };
+
+    cached.promise = mongoose.connect(process.env.MONGO_URI, opts).then((mongooseInstance) => {
+      console.log("MongoDB Connected");
+      return mongooseInstance;
     });
-    return;
+  } else {
+    console.log("MongoDB connection promise already in progress, awaiting...");
   }
 
   try {
-    console.log("Connecting to MongoDB...");
-    await mongoose.connect(process.env.MONGO_URI, {
-      bufferCommands: false, // Disable buffering for serverless to fail fast if disconnected
-    });
-    console.log("MongoDB Connected");
+    cached.conn = await cached.promise;
   } catch (error) {
     console.error("MongoDB connection failed:", error.message);
-    // Do not call process.exit(1) in serverless environments — throw instead so Express handles it
+    // Reset the cached promise/connection on failure so subsequent requests can try again
+    cached.promise = null;
+    cached.conn = null;
     throw error;
   }
+
+  return cached.conn;
 };
 
 module.exports = connectDB;
