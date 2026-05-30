@@ -10,11 +10,12 @@ import CommonErrorField from "./CommonErrorField";
 interface CustomInputFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
+  leftIcon?: React.ReactNode;
   wrapperClassName?: string;
 }
 
 const CustomInputField = React.forwardRef<HTMLInputElement, CustomInputFieldProps>(
-  ({ label, error, type = "text", id, className, wrapperClassName, required, ...props }, ref) => {
+  ({ label, error, leftIcon, type = "text", id, className, wrapperClassName, required, ...props }, ref) => {
     const [showPassword, setShowPassword] = useState(false);
 
     return (
@@ -26,12 +27,18 @@ const CustomInputField = React.forwardRef<HTMLInputElement, CustomInputFieldProp
           </Label>
         )}
         <div className="relative">
+          {leftIcon && (
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none flex items-center justify-center z-10">
+              {leftIcon}
+            </div>
+          )}
           <Input
             id={id}
             type={type === "password" && showPassword ? "text" : type}
             ref={ref}
             className={cn(
               "w-full bg-slate-50/70 border-slate-200 rounded-lg focus:bg-white transition-colors pr-10",
+              leftIcon && "pl-10",
               error && "border-destructive focus-visible:ring-destructive",
               className
             )}

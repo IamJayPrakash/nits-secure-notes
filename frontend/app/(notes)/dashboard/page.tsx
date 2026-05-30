@@ -7,13 +7,15 @@ import { useNotes } from "@/context/notes-context";
 import { Plus, Search, Trash2, Edit3, FileText } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import CommonButton from "@/components/common/CommonButton";
-import { Input } from "@/components/ui/input";
+import CustomInputField from "@/components/common/CustomInputField";
+import CommonConfirmModal from "@/components/common/CommonConfirmModal";
 import { toast } from "sonner";
 
 const ListNotes = () => {
   const router = useRouter();
   const { notes, deleteNote } = useNotes();
   const [searchQuery, setSearchQuery] = useState("");
+  const [noteToDelete, setNoteToDelete] = useState<{ id: string; title: string } | null>(null);
 
   const filteredNotes = notes.filter(
     (note) =>
@@ -21,10 +23,9 @@ const ListNotes = () => {
       note.description.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  const handleDelete = (e: React.MouseEvent, id: string, title: string) => {
+  const handleDeleteClick = (e: React.MouseEvent, id: string, title: string) => {
     e.stopPropagation(); // Prevent card navigation
-    deleteNote(id);
-    toast.success(`"${title}" deleted successfully.`);
+    setNoteToDelete({ id, title });
   };
 
   return (
@@ -43,16 +44,15 @@ const ListNotes = () => {
             </CommonButton>
           </Link>
 
-          <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
-            <Input
-              type="text"
-              placeholder="Search notes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-white border border-slate-200 focus-visible:ring-primary rounded-xl pl-10 pr-4 py-6 shadow-xs text-sm text-slate-800 transition-all placeholder:text-slate-400"
-            />
-          </div>
+          <CustomInputField
+            type="text"
+            placeholder="Search notes..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            leftIcon={<Search className="h-4 w-4 text-slate-400" />}
+            wrapperClassName="flex-1"
+            className="w-full bg-white border border-slate-200 focus-visible:ring-primary rounded-xl py-6 shadow-xs text-sm text-slate-800 transition-all placeholder:text-slate-400"
+          />
         </div>
 
         {/* Notes list */}
@@ -100,7 +100,7 @@ const ListNotes = () => {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={(e) => handleDelete(e, note.id, note.title)}
+                    onClick={(e) => handleDeleteClick(e, note.id, note.title)}
                     className="h-8 w-8 text-slate-400 hover:text-destructive hover:bg-destructive/5 rounded-lg cursor-pointer"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -127,6 +127,28 @@ const ListNotes = () => {
             </Card>
           )}
         </div>
+
+        {/* Delete Confirmation Modal */}
+        <CommonConfirmModal
+          isOpen={!!noteToDelete}
+          onClose={() => setNoteToDelete(null)}
+          onConfirm={() => {
+            if (noteToDelete) {
+              deleteNote(noteToDelete.id);
+              toast.success(`"${noteToDelete.title}" deleted successfully.`);
+              setNoteToDelete(null);
+            }
+          }}
+          title="Delete Note"
+          description={
+            <>
+              Are you sure you want to delete this note? This action cannot be undone and will permanently delete{" "}
+              <strong className="text-slate-800">&quot;{noteToDelete?.title}&quot;</strong>.
+            </>
+          }
+          confirmText="Delete Note"
+          variant="destructive"
+        />
 
       </div>
     </div>
