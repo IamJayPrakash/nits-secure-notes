@@ -1,4 +1,4 @@
-import { FullScreenLoader } from '@/components'
+import FullScreenLoader from "@/components/common/FullScreenLoader"
 
 const Loading = () => {
     return (

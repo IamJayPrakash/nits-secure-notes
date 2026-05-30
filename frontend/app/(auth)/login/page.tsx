@@ -1,3 +1,5 @@
-import { LoginPage } from "@/components";
+import LoginPage from "@/components/auth/LoginPage";
 
-export default LoginPage; 
+export default function Page() {
+  return <LoginPage />;
+} 

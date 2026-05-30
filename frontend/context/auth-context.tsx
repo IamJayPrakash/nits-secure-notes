@@ -1,3 +1,5 @@
+"use client";
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface User {
@@ -20,11 +22,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     console.log("Login:", email, password);
     // For now, just set a dummy user
     setUser({ email });
+    document.cookie = "auth_token=dummy_token; path=/; max-age=86400; SameSite=Lax";
   };
 
   const logout = async () => {
     // Handle logout logic here
     setUser(null);
+    document.cookie = "auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT;";
   };
 
   return (
