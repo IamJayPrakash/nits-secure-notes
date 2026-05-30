@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/providers/query-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider } from "@/context/auth-context";
+import { NotesProvider } from "@/context/notes-context";
 
 const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
 
@@ -35,10 +36,12 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <Toaster/>
-          <QueryProvider>
-            {children}
-          </QueryProvider>
+          <NotesProvider>
+            <Toaster/>
+            <QueryProvider>
+              {children}
+            </QueryProvider>
+          </NotesProvider>
         </AuthProvider>
       </body>
     </html>
