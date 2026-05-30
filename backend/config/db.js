@@ -11,19 +11,35 @@
 
 const mongoose = require("mongoose");
 
+let cachedConnection = null;
+
 /**
  * Connects to MongoDB using the URI from environment variables.
- * If connection fails, the process exits so the server doesn't run without a DB.
+ * Caches the connection in serverless environments to prevent connection limits.
  */
 const connectDB = async () => {
+  // If we already have a connection, reuse it
+  if (mongoose.connection.readyState === 1) {
+    console.log("MongoDB using cached connection");
+    return;
+  }
+
+  // If connection is in progress, await it
+  if (mongoose.connection.readyState === 2) {
+    console.log("MongoDB connection is already connecting...");
+    return;
+  }
+
   try {
-    // mongoose.connect() returns a promise — we await it to know if it succeeded
-    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Connecting to MongoDB...");
+    await mongoose.connect(process.env.MONGO_URI, {
+      bufferCommands: false, // Disable buffering for serverless to fail fast if disconnected
+    });
     console.log("MongoDB Connected");
   } catch (error) {
     console.error("MongoDB connection failed:", error.message);
-    // Exit with code 1 (failure) — prevents the app from running without a DB
-    process.exit(1);
+    // Do not call process.exit(1) in serverless environments — throw instead so Express handles it
+    throw error;
   }
 };
 

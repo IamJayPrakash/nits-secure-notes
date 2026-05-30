@@ -55,6 +55,19 @@ app.use(express.json({ limit: "10kb" }));
 // This prevents MongoDB operator injection attacks like: { "email": { "$gt": "" } }
 app.use(mongoSanitize());
 
+// ── Database Connection Middleware ───────────────────────────────────────────
+// Ensures MongoDB is connected before handling any route queries.
+// Safe for serverless production and local development.
+const connectDB = require("./config/db");
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
 // ── Routes ────────────────────────────────────────────────────────────────────
 // Each route group is mounted at a specific base path.
 // Express will forward matching requests to the correct router file.
