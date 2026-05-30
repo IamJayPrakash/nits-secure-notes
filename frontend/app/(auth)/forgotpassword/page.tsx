@@ -1,9 +1,5 @@
-import React from 'react'
+import ForgotPasswordPage from "@/components/auth/ForgotPasswordPage";
 
-const ForgotPassword = () => {
-  return (
-    <div>ForgotPassword</div>
-  )
+export default function Page() {
+  return <ForgotPasswordPage />;
 }
-
-export default ForgotPassword
