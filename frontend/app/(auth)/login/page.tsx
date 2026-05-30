@@ -1,7 +1,3 @@
-import { Card } from "@/components/ui/card";
+import { LoginPage } from "@/components";
 
-const Login = () => {
-  return <Card className="">Login</Card>;
-};
-
-export default Login;
+export default LoginPage; 
