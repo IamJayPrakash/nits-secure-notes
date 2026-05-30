@@ -35,14 +35,14 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", figtree.variable)}
     >
       <body className="min-h-full flex flex-col">
-        <AuthProvider>
-          <NotesProvider>
-            <Toaster/>
-            <QueryProvider>
+        <QueryProvider>
+          <AuthProvider>
+            <NotesProvider>
+              <Toaster/>
               {children}
-            </QueryProvider>
-          </NotesProvider>
-        </AuthProvider>
+            </NotesProvider>
+          </AuthProvider>
+        </QueryProvider>
       </body>
     </html>
   );
