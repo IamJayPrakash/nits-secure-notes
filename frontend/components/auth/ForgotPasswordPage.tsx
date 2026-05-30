@@ -6,6 +6,7 @@ import CommonButton from "@/components/common/CommonButton";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { ArrowLeft } from "lucide-react";
 
 const ForgotPasswordPage = () => {
   const router = useRouter();
@@ -28,7 +29,7 @@ const ForgotPasswordPage = () => {
     <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4">
       <Card className="p-8 w-full max-w-sm border border-slate-100 shadow-md bg-white rounded-2xl">
         <div className="prose prose-slate max-w-none text-center">
-          <h1 className="mb-2">
+          <h1 className="mb-2 text-2xl font-semibold">
             Secure Notes
           </h1>
           <p className="text-sm text-slate-500 mb-6">
@@ -61,7 +62,7 @@ const ForgotPasswordPage = () => {
           type="button"
           variant="link"
           onClick={() => router.push("/login")}
-          className="block w-full text-center mt-5 text-sm font-medium text-slate-500 hover:text-primary hover:no-underline transition-colors cursor-pointer"
+          leftIcon={<ArrowLeft/>}
         >
           Back to Login
         </CommonButton>

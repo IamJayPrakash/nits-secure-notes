@@ -9,6 +9,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AUTH_MESSAGES, AUTH_TABS } from "@/utils/constants";
 import Link from "next/link";
+import { Shield } from "lucide-react";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -44,7 +45,7 @@ const LoginPage = () => {
     <div className="flex items-center justify-center min-h-screen bg-slate-50 p-4">
       <Card className="p-8 w-full max-w-sm border border-slate-100 shadow-md bg-white rounded-2xl">
         <div className="prose prose-slate max-w-none">
-          <h1 className="text-center mb-6">
+         <h1 className="mb-2 text-2xl font-semibold text-center">
             Secure Notes
           </h1>
         </div>
@@ -93,7 +94,9 @@ const LoginPage = () => {
 
           <CommonButton
             type="submit"
-            className="w-full py-6 mt-6 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all shadow-xs cursor-pointer"
+            variant="default"
+            size="lg"
+            className="w-full rounded-sm"
           >
             {activeTab === "login" ? "Login" : "Register"}
           </CommonButton>
@@ -102,7 +105,7 @@ const LoginPage = () => {
         {activeTab === "login" && (
           <Link
             href="/forgotpassword"
-            className="block text-center mt-5 text-sm font-medium text-slate-500 hover:text-primary transition-colors"
+            className="text-center hover:underline hover:text-primary"
           >
             Forgot password?
           </Link>

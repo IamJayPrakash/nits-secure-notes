@@ -32,7 +32,7 @@ const CommonTab: React.FC<CommonTabProps> = ({
     >
       <TabsList
         className={cn(
-          "grid w-full grid-cols-2 bg-slate-100/80 p-1 rounded-xl border border-slate-200/50 h-auto",
+          "grid w-full grid-cols-2 bg-slate-100/80 rounded-xl border border-slate-200/50 h-auto",
           listClassName
         )}
       >
@@ -41,7 +41,7 @@ const CommonTab: React.FC<CommonTabProps> = ({
             key={option.value}
             value={option.value}
             className={cn(
-              "py-2 text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer text-slate-600 hover:text-slate-900 bg-transparent data-active:bg-primary data-active:text-primary-foreground data-active:shadow-xs",
+              "text-sm font-semibold rounded-lg transition-all duration-200 cursor-pointer text-slate-600 bg-transparent data-active:bg-primary data-active:text-primary-foreground data-active:shadow-xs",
               triggerClassName
             )}
           >
