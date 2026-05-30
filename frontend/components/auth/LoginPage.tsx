@@ -13,17 +13,17 @@ import { useAuth } from "@/context/auth-context";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, registerSchema, LoginInput, RegisterInput } from "@/utils/validations/auth";
+import axios from "axios";
 
 const LoginPage = () => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { login } = useAuth();
-  
+  const { login, register } = useAuth();
+
   const activeTab = pathname === "/register" ? "register" : "login";
   const [loading, setLoading] = useState(false);
 
-  // Initialize login form
   const {
     register: registerLogin,
     handleSubmit: handleLoginSubmit,
@@ -33,7 +33,6 @@ const LoginPage = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  // Initialize register form
   const {
     register: registerRegister,
     handleSubmit: handleRegisterSubmit,
@@ -47,14 +46,11 @@ const LoginPage = () => {
     const errorParam = searchParams.get("error");
     if (errorParam === "unauthorized") {
       toast.error(AUTH_MESSAGES.UNAUTHORIZED);
-      
-      // Clean up URL query parameters so refreshing doesn't re-trigger the toast
       const cleanUrl = window.location.pathname;
       window.history.replaceState({}, document.title, cleanUrl);
     }
   }, [searchParams]);
 
-  // Reset forms when switching tabs
   useEffect(() => {
     resetLoginForm();
     resetRegisterForm();
@@ -67,22 +63,32 @@ const LoginPage = () => {
       toast.success("Successfully logged in!");
       router.push("/dashboard");
     } catch (err) {
-      console.error(err);
-      toast.error("Invalid email or password");
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Invalid email or password");
+      } else {
+        toast.error("Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
   };
 
-  const onRegisterSubmit = async () => {
+  const onRegisterSubmit = async (data: RegisterInput) => {
     setLoading(true);
     try {
-      // Simulate registration
-      toast.success("Registration successful! You can now log in.");
+      await register({
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+      toast.success("Registration successful! Please log in.");
       router.push("/login");
     } catch (err) {
-      console.error(err);
-      toast.error("Registration failed");
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Registration failed");
+      } else {
+        toast.error("Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
@@ -140,6 +146,15 @@ const LoginPage = () => {
         {/* Register Form */}
         {activeTab === "register" && (
           <form onSubmit={handleRegisterSubmit(onRegisterSubmit)} className="space-y-4">
+            <CustomInputField
+              id="name"
+              label="Full Name"
+              type="text"
+              placeholder="Enter your full name"
+              error={registerErrors.name?.message}
+              {...registerRegister("name")}
+            />
+
             <CustomInputField
               id="email"
               label="Email"

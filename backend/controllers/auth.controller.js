@@ -1,103 +1,77 @@
-const User = require("../model/User");
-const bcrypt = require("bcryptjs");
-const generateToken = require("../utils/generateToken");
+const jwt = require("jsonwebtoken");
+const User = require("../models/User");
+const { generateAccessToken, generateRefreshToken } = require("../utils/generateToken");
+const { registerUser, loginUser } = require("../services/auth.service");
+const { sendSuccess, sendError } = require("../utils/response");
 
-const registerUser = async (req, res) => {
+const register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
-
-    if (!name || !email || !password) {
-      return res.status(400).json({
-        success: false,
-        message: "All fields are required",
-      });
-    }
-
-    const existingUser = await User.findOne({ email });
-
-    if (existingUser) {
-      return res.status(409).json({
-        success: false,
-        message: "User already exists",
-      });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await User.create({
-      name,
-      email,
-      password: hashedPassword,
-    });
-
-    res.status(201).json({
-      success: true,
-      message: "User registered successfully",
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
-    });
+    const user = await registerUser(req.body);
+    return sendSuccess(res, 201, "User registered successfully", user);
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
+    return sendError(res, error.statusCode || 500, error.message);
   }
 };
 
-
-const loginUser = async (req, res) => {
+const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-
-    if (!user) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
-    }
-
-    const isPasswordValid = await bcrypt.compare(
-      password,
-      user.password
-    );
-
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        success: false,
-        message: "Invalid credentials",
-      });
-    }
-
-    const token = generateToken(user._id);
-
-    res.status(200).json({
-      success: true,
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-      },
-    });
+    const result = await loginUser(req.body);
+    return sendSuccess(res, 200, "Login successful", result);
   } catch (error) {
-    console.error(error);
-
-    res.status(500).json({
-      success: false,
-      message: "Server Error",
-    });
+    return sendError(res, error.statusCode || 500, error.message);
   }
 };
 
+const refresh = async (req, res) => {
+  try {
+    const { refreshToken } = req.body;
+    if (!refreshToken) {
+      return sendError(res, 400, "Refresh token required");
+    }
 
-module.exports = {
-  registerUser,
-  loginUser,
+    let decoded;
+    try {
+      decoded = jwt.verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET || "super_secret_refresh_key_change_in_prod"
+      );
+    } catch (err) {
+      return sendError(res, 401, "Invalid refresh token");
+    }
+
+    const user = await User.findById(decoded.userId);
+    if (!user || user.refreshToken !== refreshToken) {
+      return sendError(res, 401, "Invalid or expired refresh token");
+    }
+
+    const newAccessToken = generateAccessToken(user._id);
+    const newRefreshToken = generateRefreshToken(user._id);
+
+    user.refreshToken = newRefreshToken;
+    await user.save();
+
+    return sendSuccess(res, 200, "Tokens refreshed successfully", {
+      token: newAccessToken,
+      refreshToken: newRefreshToken,
+    });
+  } catch (error) {
+    return sendError(res, 500, error.message);
+  }
 };
+
+const logout = async (req, res) => {
+  try {
+    if (req.user && req.user.userId) {
+      const user = await User.findById(req.user.userId);
+      if (user) {
+        user.refreshToken = "";
+        await user.save();
+      }
+    }
+    return sendSuccess(res, 200, "Logout successful");
+  } catch (error) {
+    return sendError(res, 500, error.message);
+  }
+};
+
+module.exports = { register, login, refresh, logout };

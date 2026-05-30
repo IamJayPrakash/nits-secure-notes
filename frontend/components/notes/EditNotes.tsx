@@ -47,11 +47,10 @@ const EditNotes = () => {
     if (!id) return;
     setLoading(true);
     try {
-      updateNote(id, data.title, data.description);
+      await updateNote(id, { title: data.title, description: data.description });
       toast.success("Note updated successfully!");
       router.push("/dashboard");
-    } catch (e) {
-      console.error(e);
+    } catch {
       toast.error("Failed to update note");
     } finally {
       setLoading(false);

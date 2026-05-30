@@ -24,7 +24,7 @@ const ListNotes = () => {
   );
 
   const handleDeleteClick = (e: React.MouseEvent, id: string, title: string) => {
-    e.stopPropagation(); // Prevent card navigation
+    e.stopPropagation();
     setNoteToDelete({ id, title });
   };
 
@@ -60,8 +60,8 @@ const ListNotes = () => {
           {filteredNotes.length > 0 ? (
             filteredNotes.map((note) => (
               <Card
-                key={note.id}
-                onClick={() => router.push(`/edit-notes?id=${note.id}`)}
+                key={note._id}
+                onClick={() => router.push(`/edit-notes?id=${note._id}`)}
                 className="group relative p-6 border border-slate-100 hover:border-primary/20 bg-white rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer flex gap-4 items-start"
               >
                 {/* File/Doc Icon visual */}
@@ -90,7 +90,7 @@ const ListNotes = () => {
                     size="icon"
                     onClick={(e) => {
                       e.stopPropagation();
-                      router.push(`/edit-notes?id=${note.id}`);
+                      router.push(`/edit-notes?id=${note._id}`);
                     }}
                     className="h-8 w-8 text-slate-400 hover:text-primary hover:bg-slate-50 rounded-lg cursor-pointer"
                   >
@@ -100,7 +100,7 @@ const ListNotes = () => {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    onClick={(e) => handleDeleteClick(e, note.id, note.title)}
+                    onClick={(e) => handleDeleteClick(e, note._id, note.title)}
                     className="h-8 w-8 text-slate-400 hover:text-destructive hover:bg-destructive/5 rounded-lg cursor-pointer"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -132,11 +132,16 @@ const ListNotes = () => {
         <CommonConfirmModal
           isOpen={!!noteToDelete}
           onClose={() => setNoteToDelete(null)}
-          onConfirm={() => {
+          onConfirm={async () => {
             if (noteToDelete) {
-              deleteNote(noteToDelete.id);
-              toast.success(`"${noteToDelete.title}" deleted successfully.`);
-              setNoteToDelete(null);
+              try {
+                await deleteNote(noteToDelete.id);
+                toast.success(`"${noteToDelete.title}" deleted successfully.`);
+              } catch {
+                toast.error("Failed to delete note");
+              } finally {
+                setNoteToDelete(null);
+              }
             }
           }}
           title="Delete Note"

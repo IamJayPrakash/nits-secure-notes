@@ -1,135 +1,96 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-
-export interface Note {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: string;
-}
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { notesService, Note, NotePayload, NotesQuery } from "@/services/notes.service";
+import { useAuth } from "@/context/auth-context";
 
 interface NotesContextType {
   notes: Note[];
-  addNote: (title: string, description: string) => void;
-  updateNote: (id: string, title: string, description: string) => void;
-  deleteNote: (id: string) => void;
+  isLoading: boolean;
+  isError: boolean;
+  searchQuery: string;
+  setSearchQuery: (q: string) => void;
+  sortBy: NotesQuery["sortBy"];
+  setSortBy: (s: NotesQuery["sortBy"]) => void;
+  order: NotesQuery["order"];
+  setOrder: (o: NotesQuery["order"]) => void;
+  addNote: (payload: NotePayload) => Promise<void>;
+  updateNote: (id: string, payload: NotePayload) => Promise<void>;
+  deleteNote: (id: string) => Promise<void>;
   getNoteById: (id: string) => Note | undefined;
 }
 
 const NotesContext = createContext<NotesContextType | undefined>(undefined);
 
-const DEFAULT_NOTES: Note[] = [
-  {
-    id: "default-1",
-    title: "Welcome to Secure Notes",
-    description: "This is your dashboard. Here you can search, create, edit, or delete notes securely. All notes are saved automatically in your local storage.",
-    createdAt: new Date(Date.now() - 3600000 * 24 * 2).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }),
-  },
-  {
-    id: "default-2",
-    title: "Project Architecture Tasks",
-    description: "Design and implement custom input fields, setup Next.js server middleware for route protection, write client forms using react-hook-form, and enforce strict Zod verification.",
-    createdAt: new Date(Date.now() - 3600000 * 4).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }),
-  },
-  {
-    id: "default-3",
-    title: "Tailwind Typography Styling",
-    description: "Use tailwind typography plugin (prose class) to automatically style rich text content, layout lists, quotes, and standard headings consistently across the app.",
-    createdAt: new Date().toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }),
-  },
-];
-
 export function NotesProvider({ children }: { children: ReactNode }) {
-  const [notes, setNotes] = useState<Note[]>([]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  // Load notes from localStorage on mount
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem("secure_notes");
-      if (stored) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setNotes(JSON.parse(stored));
-      } else {
-         
-        setNotes(DEFAULT_NOTES);
-        localStorage.setItem("secure_notes", JSON.stringify(DEFAULT_NOTES));
-      }
-    } catch (e) {
-      console.error("Error reading localStorage", e);
-       
-      setNotes(DEFAULT_NOTES);
-    }
-    setIsLoaded(true);
-  }, []);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<NotesQuery["sortBy"]>("createdAt");
+  const [order, setOrder] = useState<NotesQuery["order"]>("desc");
 
-  // Save notes to localStorage on change
-  useEffect(() => {
-    if (isLoaded) {
-      try {
-        localStorage.setItem("secure_notes", JSON.stringify(notes));
-      } catch (e) {
-        console.error("Error writing to localStorage", e);
-      }
-    }
-  }, [notes, isLoaded]);
+  const queryKey = ["notes", searchQuery, sortBy, order];
 
-  const addNote = (title: string, description: string) => {
-    const newNote: Note = {
-      id: Math.random().toString(36).substring(2, 9),
-      title,
-      description,
-      createdAt: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-    };
-    setNotes((prev) => [newNote, ...prev]);
+  const {
+    data: notes = [],
+    isLoading,
+    isError,
+  } = useQuery({
+    queryKey,
+    queryFn: () => notesService.getAll({ search: searchQuery, sortBy, order }),
+    enabled: !!user,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: notesService.create,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }),
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: NotePayload }) =>
+      notesService.update(id, payload),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: notesService.delete,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["notes"] }),
+  });
+
+  const addNote = async (payload: NotePayload) => {
+    await createMutation.mutateAsync(payload);
   };
 
-  const updateNote = (id: string, title: string, description: string) => {
-    setNotes((prev) =>
-      prev.map((note) =>
-        note.id === id
-          ? {
-              ...note,
-              title,
-              description,
-              createdAt: new Date().toLocaleDateString("en-US", {
-                month: "short",
-                day: "numeric",
-                year: "numeric",
-              }),
-            }
-          : note
-      )
-    );
+  const updateNote = async (id: string, payload: NotePayload) => {
+    await updateMutation.mutateAsync({ id, payload });
   };
 
-  const deleteNote = (id: string) => {
-    setNotes((prev) => prev.filter((note) => note.id !== id));
+  const deleteNote = async (id: string) => {
+    await deleteMutation.mutateAsync(id);
   };
 
-  const getNoteById = (id: string) => {
-    return notes.find((note) => note.id === id);
-  };
+  const getNoteById = (id: string) => notes.find((n) => n._id === id);
 
   return (
-    <NotesContext.Provider value={{ notes, addNote, updateNote, deleteNote, getNoteById }}>
+    <NotesContext.Provider
+      value={{
+        notes,
+        isLoading,
+        isError,
+        searchQuery,
+        setSearchQuery,
+        sortBy,
+        setSortBy,
+        order,
+        setOrder,
+        addNote,
+        updateNote,
+        deleteNote,
+        getNoteById,
+      }}
+    >
       {children}
     </NotesContext.Provider>
   );
@@ -137,8 +98,6 @@ export function NotesProvider({ children }: { children: ReactNode }) {
 
 export function useNotes() {
   const context = useContext(NotesContext);
-  if (!context) {
-    throw new Error("useNotes must be used within a NotesProvider");
-  }
+  if (!context) throw new Error("useNotes must be used within a NotesProvider");
   return context;
 }

@@ -5,24 +5,47 @@ import CustomInputField from "@/components/common/CustomInputField";
 import CommonButton from "@/components/common/CommonButton";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import { forgotPasswordService } from "@/services/forgot-password.service";
+import axios from "axios";
+
+const schema = z.object({
+  email: z.string().min(1, "Email is required").email("Invalid email format"),
+});
+
+type ForgotPasswordInput = z.infer<typeof schema>;
 
 const ForgotPasswordPage = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ForgotPasswordInput>({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = async (data: ForgotPasswordInput) => {
     setLoading(true);
-    // Simulate sending reset link
-    console.log("Sending reset link to:", email);
-    setTimeout(() => {
-      setLoading(false);
-      toast.success("Password reset link sent to your email!");
+    try {
+      await forgotPasswordService.send(data.email);
+      toast.success("If an account exists, a reset link has been sent!");
       router.push("/login");
-    }, 1500);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        toast.error(err.response?.data?.message || "Something went wrong");
+      } else {
+        toast.error("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -33,26 +56,24 @@ const ForgotPasswordPage = () => {
             Secure Notes
           </h1>
           <p className="text-sm text-slate-500 mb-6">
-            Forgot Password
+            Enter your email and we&apos;ll send a reset link.
           </p>
         </div>
 
-        {/* Forgot Password Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <CustomInputField
             id="email"
             label="Email Address"
             type="email"
             placeholder="Enter your email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+            error={errors.email?.message}
+            {...register("email")}
           />
 
           <CommonButton
             type="submit"
             loading={loading}
-            className="w-full py-6 mt-6 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all shadow-xs cursor-pointer"
+            className="w-full py-6 mt-2 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl transition-all shadow-xs cursor-pointer"
           >
             Send Reset Link
           </CommonButton>
@@ -62,7 +83,8 @@ const ForgotPasswordPage = () => {
           type="button"
           variant="link"
           onClick={() => router.push("/login")}
-          leftIcon={<ArrowLeft/>}
+          leftIcon={<ArrowLeft />}
+          className="mt-4 w-full"
         >
           Back to Login
         </CommonButton>

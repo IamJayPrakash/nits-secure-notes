@@ -30,11 +30,10 @@ const AddNotes = () => {
   const onSubmit = async (data: NoteInput) => {
     setLoading(true);
     try {
-      addNote(data.title, data.description);
+      await addNote({ title: data.title, description: data.description });
       toast.success("Note created successfully!");
       router.push("/dashboard");
-    } catch (e) {
-      console.error(e);
+    } catch {
       toast.error("Failed to create note");
     } finally {
       setLoading(false);
