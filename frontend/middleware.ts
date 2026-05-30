@@ -15,12 +15,12 @@ export function middleware(request: NextRequest) {
 
   // Redirect to login if accessing a protected route without being authenticated
   if (isProtectedRoute && !token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/login?error=unauthorized", request.url));
   }
 
   // Redirect to dashboard if trying to access login/register while already authenticated
   if (isAuthRoute && token) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
+    return NextResponse.redirect(new URL("/dashboard?info=already_logged_in", request.url));
   }
 
   return NextResponse.next();

@@ -4,17 +4,30 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 const LoginPage = () => {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
   const activeTab = pathname === "/register" ? "register" : "login";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  useEffect(() => {
+    const errorParam = searchParams.get("error");
+    if (errorParam === "unauthorized") {
+      toast.error("You must be logged in to access this page.");
+      
+      // Clean up URL query parameters so refreshing doesn't re-trigger the toast
+      const cleanUrl = window.location.pathname;
+      window.history.replaceState({}, document.title, cleanUrl);
+    }
+  }, [searchParams]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
