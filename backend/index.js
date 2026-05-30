@@ -14,13 +14,8 @@
 require("dotenv").config({ path: ".env.local" });
 
 const app = require("./app");           // Express app configuration
-const connectDB = require("./config/db"); // MongoDB connection function
-
 // Read PORT from environment, fallback to 5000 if not set
 const PORT = process.env.PORT || 5000;
-
-// Connect to MongoDB
-connectDB();
 
 // Only listen on a port if not running in serverless production (Vercel)
 if (process.env.NODE_ENV !== "production") {
