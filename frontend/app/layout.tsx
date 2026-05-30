@@ -4,6 +4,8 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { QueryProvider } from "@/providers/query-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { Header,Footer } from "@/components";
+import { AuthProvider } from "@/context/auth-context";
 
 const figtree = Figtree({subsets:['latin'],variable:'--font-sans'});
 
@@ -33,10 +35,14 @@ export default function RootLayout({
       className={cn("h-full", "antialiased", geistSans.variable, geistMono.variable, "font-sans", figtree.variable)}
     >
       <body className="min-h-full flex flex-col">
+        <AuthProvider>
+          <Header/>
         <Toaster/>
         <QueryProvider>
           {children}
         </QueryProvider>
+        <Footer/>
+        </AuthProvider>
       </body>
     </html>
   );

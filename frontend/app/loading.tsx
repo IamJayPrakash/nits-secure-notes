@@ -1,9 +1,9 @@
 import { FullScreenLoader } from '@/components'
 
-const loading = () => {
+const Loading = () => {
     return (
         <FullScreenLoader />
     )
 }
 
-export default loading
+export default Loading
