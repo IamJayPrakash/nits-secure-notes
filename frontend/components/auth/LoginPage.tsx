@@ -9,7 +9,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { AUTH_MESSAGES, AUTH_TABS } from "@/utils/constants";
 import Link from "next/link";
-import { Shield } from "lucide-react";
 
 const LoginPage = () => {
   const router = useRouter();
