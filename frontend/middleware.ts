@@ -9,8 +9,8 @@ export function middleware(request: NextRequest) {
     pathname === "/login" || pathname === "/register" || pathname === "/forgotpassword";
 
   const isProtectedRoute =
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/create-notes") ||
+    // pathname.startsWith("/dashboard") ||
+    // pathname.startsWith("/create-notes") ||
     pathname.startsWith("/edit-notes");
 
   // Redirect to login if accessing a protected route without being authenticated

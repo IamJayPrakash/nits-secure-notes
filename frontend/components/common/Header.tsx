@@ -39,9 +39,9 @@ const Header = () => {
           <CommonButton
             variant="ghost"
             onClick={handleLogout}
-            className="flex items-center gap-2 text-white hover:bg-white/15 hover:text-white px-3 py-1.5 rounded-lg border border-transparent transition-all font-medium text-sm cursor-pointer"
+            leftIcon={<LogOut className="h-4 w-4" />}
+
           >
-            <LogOut className="h-4 w-4" />
             <span className="hidden sm:inline">Logout</span>
           </CommonButton>
         </div>
