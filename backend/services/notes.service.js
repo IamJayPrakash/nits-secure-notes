@@ -1,10 +1,5 @@
 const Note = require("../models/Notes");
 
-/**
- * Get all notes for a user with optional sorting.
- * @param {string} userId
- * @param {{ sortBy?: string, order?: string }} options
- */
 const getNotes = async (userId, { sortBy = "createdAt", order = "desc" } = {}) => {
   const filter = { userId };
 
@@ -30,7 +25,6 @@ const createNote = async ({ title, description, userId }) => {
 };
 
 const updateNote = async (id, userId, { title, description }) => {
-  // Only allow explicit fields — prevents mass assignment injection
   const note = await Note.findOneAndUpdate(
     { _id: id, userId },
     { title, description },

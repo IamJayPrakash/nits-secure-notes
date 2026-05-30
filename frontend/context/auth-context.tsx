@@ -20,7 +20,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Hydrate user from localStorage on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem(USER_KEY);
@@ -33,7 +32,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
     } catch {
-      // ignore parse errors
     }
     setTimeout(() => {
       setIsLoading(false);
@@ -44,7 +42,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem(TOKEN_KEY, token);
     localStorage.setItem("refresh_token", refreshToken);
     localStorage.setItem(USER_KEY, JSON.stringify(userData));
-    // Also set cookie so Next.js middleware can read it
     document.cookie = `auth_token=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
     setUser(userData);
   };
@@ -62,7 +59,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.logout();
     } catch {
-      // Ignore errors on logout
     } finally {
       localStorage.removeItem(TOKEN_KEY);
       localStorage.removeItem("refresh_token");

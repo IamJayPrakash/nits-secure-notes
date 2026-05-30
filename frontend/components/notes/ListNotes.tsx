@@ -31,8 +31,8 @@ const ListNotes = () => {
   return (
     <div className="min-h-screen bg-slate-50/50 py-10 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-2xl space-y-6">
-        
-        {/* Action Header bar: Add Note + Search */}
+
+                {}
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
           <Link href="/create-notes" className="shrink-0">
             <CommonButton
@@ -55,7 +55,7 @@ const ListNotes = () => {
           />
         </div>
 
-        {/* Notes list */}
+        {}
         <div className="space-y-4">
           {filteredNotes.length > 0 ? (
             filteredNotes.map((note) => (
@@ -64,12 +64,12 @@ const ListNotes = () => {
                 onClick={() => router.push(`/edit-notes?id=${note._id}`)}
                 className="group relative p-6 border border-slate-100 hover:border-primary/20 bg-white rounded-2xl shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer flex gap-4 items-start"
               >
-                {/* File/Doc Icon visual */}
+                {}
                 <div className="flex items-center justify-center h-12 w-12 rounded-xl bg-slate-50 text-slate-500 group-hover:bg-primary/5 group-hover:text-primary transition-colors shrink-0">
                   <FileText className="h-6 w-6" />
                 </div>
 
-                {/* Text Content */}
+                {}
                 <div className="flex-1 min-w-0 pr-12">
                   <h3 className="text-lg font-bold text-slate-800 tracking-tight leading-snug group-hover:text-primary transition-colors truncate">
                     {note.title}
@@ -82,7 +82,7 @@ const ListNotes = () => {
                   </span>
                 </div>
 
-                {/* Card Actions Hover */}
+                {}
                 <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-1.5 opacity-90 sm:opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                   <CommonButton
                     type="button"
@@ -128,7 +128,7 @@ const ListNotes = () => {
           )}
         </div>
 
-        {/* Delete Confirmation Modal */}
+        {}
         <CommonConfirmModal
           isOpen={!!noteToDelete}
           onClose={() => setNoteToDelete(null)}

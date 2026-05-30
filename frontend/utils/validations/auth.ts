@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// Sanitize helper — strips HTML tags client-side before sending
 export const sanitize = (str: string) =>
   str.replace(/<[^>]*>/g, "").trim();
 

@@ -39,7 +39,6 @@ const loginUser = async ({ email, password }) => {
   const token = generateAccessToken(user._id);
   const refreshToken = generateRefreshToken(user._id);
 
-  // Store refresh token in user document
   user.refreshToken = refreshToken;
   await user.save();
 

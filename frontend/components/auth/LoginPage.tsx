@@ -110,7 +110,7 @@ const LoginPage = () => {
           className="mb-6"
         />
 
-        {/* Login Form */}
+        {}
         {activeTab === "login" && (
           <form onSubmit={handleLoginSubmit(onLoginSubmit)} className="space-y-4">
             <CustomInputField
@@ -143,7 +143,7 @@ const LoginPage = () => {
           </form>
         )}
 
-        {/* Register Form */}
+        {}
         {activeTab === "register" && (
           <form onSubmit={handleRegisterSubmit(onRegisterSubmit)} className="space-y-4">
             <CustomInputField

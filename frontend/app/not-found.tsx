@@ -12,8 +12,8 @@ const NotFound = () => {
       <div className="max-w-md space-y-4">
         <h1 className="text-5xl font-extrabold text-primary tracking-tight">404</h1>
         <h2 className="text-2xl font-bold text-slate-800">Page Not Found</h2>
-       
-        <div className="flex gap-4 justify-center mt-6">
+
+               <div className="flex gap-4 justify-center mt-6">
           <CommonButton
             variant="outline"
             onClick={() => router.back()}

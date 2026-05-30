@@ -33,7 +33,6 @@ const EditNotes = () => {
     resolver: zodResolver(noteSchema),
   });
 
-  // Pre-populate the form with the note content when it is loaded
   useEffect(() => {
     if (note) {
       reset({

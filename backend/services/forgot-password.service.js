@@ -7,8 +7,6 @@ const forgotPassword = async ({ email }) => {
     error.statusCode = 404;
     throw error;
   }
-  // In production: generate a reset token, save it, and send email.
-  // For now we return success to avoid exposing user existence in error.
   return { email };
 };
 

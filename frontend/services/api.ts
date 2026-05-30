@@ -26,7 +26,6 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Attach token from localStorage to every request
 api.interceptors.request.use((config) => {
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("auth_token");
@@ -37,7 +36,6 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Handle 401 globally — attempt refresh token logic or clear tokens and redirect to login
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
