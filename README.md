@@ -1,17 +1,17 @@
-# 🔐 NITS Secure Notes
+#  NITS Secure Notes
 
 A secure, full-stack notes application built with **Next.js** (frontend) and **Express.js** (backend) featuring client-side AES encryption and JWT refresh token rotation.
 
 ---
 
-## ⚙️ Prerequisites
+# Prerequisites
 
 - **Node.js** v18+
 - **MongoDB** (Local or MongoDB Atlas cluster)
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### 1. Clone the Repo
 ```bash
@@ -62,7 +62,7 @@ npm run dev
 
 ---
 
-## 🔒 Core Features
+##  Core Features
 
 - **Client-Side AES Encryption**: Notes are encrypted on the client using `crypto-js` before being sent to the DB.
 - **JWT Refresh Rotation**: Auto-rotating access tokens and database-backed refresh tokens.
