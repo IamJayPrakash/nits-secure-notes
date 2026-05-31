@@ -61,10 +61,3 @@ npm run dev
 ```
 
 ---
-
-##  Core Features
-
-- **Client-Side AES Encryption**: Notes are encrypted on the client using `crypto-js` before being sent to the DB.
-- **JWT Refresh Rotation**: Auto-rotating access tokens and database-backed refresh tokens.
-- **Input Sanitization & Security**: Protection against XSS (`helmet`) and NoSQL injection (`express-mongo-sanitize`).
-- **Postman Collection**: Included in the root (`Secure-Notes-App.postman_collection.json`).
